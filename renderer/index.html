@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' file: https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' file:;" />
+<title>Asistente de Tareas Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Barra de título personalizada -->
+  <header id="titlebar">
+    <div id="titlebar-drag" class="drag">
+      <img src="../assets/icons/icon.png" class="titlebar-logo" alt="" />
+      <span class="titlebar-title">Asistente de Tareas Personal</span>
+    </div>
+    <div class="titlebar-clock" id="titlebar-clock">--:--</div>
+    <div class="titlebar-controls no-drag">
+      <button id="btn-settings" class="titlebar-icon-btn" title="Ajustes" aria-label="Ajustes">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 1 0 12 8.5zm9 3.5c0 .38-.03.75-.08 1.11l2.03 1.58a.5.5 0 0 1 .12.63l-1.92 3.32a.5.5 0 0 1-.6.22l-2.4-.96c-.5.38-1.05.7-1.64.94l-.36 2.54a.5.5 0 0 1-.5.42h-3.84a.5.5 0 0 1-.5-.42l-.36-2.54c-.59-.24-1.14-.56-1.64-.94l-2.4.96a.5.5 0 0 1-.6-.22L2.9 14.82a.5.5 0 0 1 .12-.63l2.03-1.58A8.6 8.6 0 0 1 5 12c0-.38.03-.75.08-1.11L3.05 9.31a.5.5 0 0 1-.12-.63L4.85 5.36a.5.5 0 0 1 .6-.22l2.4.96c.5-.38 1.05-.7 1.64-.94l.36-2.54a.5.5 0 0 1 .5-.42h3.84a.5.5 0 0 1 .5.42l.36 2.54c.59.24 1.14.56 1.64.94l2.4-.96a.5.5 0 0 1 .6.22l1.92 3.32a.5.5 0 0 1-.12.63l-2.03 1.58c.05.36.08.73.08 1.11z"/></svg>
+      </button>
+      <button id="win-min" class="titlebar-icon-btn" title="Minimizar" aria-label="Minimizar">
+        <svg viewBox="0 0 12 12" width="12" height="12"><rect y="5.2" width="12" height="1.6" fill="currentColor"/></svg>
+      </button>
+      <button id="win-max" class="titlebar-icon-btn" title="Maximizar" aria-label="Maximizar">
+        <svg viewBox="0 0 12 12" width="11" height="11"><rect x=".8" y=".8" width="10.4" height="10.4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <button id="win-close" class="titlebar-icon-btn titlebar-close" title="Cerrar" aria-label="Cerrar">
+        <svg viewBox="0 0 12 12" width="12" height="12"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="app-shell">
+
+    <!-- Riel del día: línea de 24h con marcadores de tareas -->
+    <aside id="timeline-rail" aria-label="Línea del día">
+      <div class="rail-heading">HOY</div>
+      <div class="rail-scroll" id="rail-scroll">
+        <div class="rail-track" id="rail-track">
+          <!-- horas y marcadores generados por JS -->
+          <div class="rail-now" id="rail-now"><span class="rail-now-dot"></span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main-content">
+      <div class="content-header">
+        <div class="tabs" id="filter-tabs" role="tablist">
+          <button class="tab active" data-filter="hoy" role="tab" aria-selected="true">Hoy</button>
+          <button class="tab" data-filter="pendientes" role="tab" aria-selected="false">Pendientes</button>
+          <button class="tab" data-filter="completadas" role="tab" aria-selected="false">Completadas</button>
+          <button class="tab" data-filter="todas" role="tab" aria-selected="false">Todas</button>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.47 6.47 0 0 0 1.57-4.23 6.5 6.5 0 1 0-6.5 6.5 6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>
+          <input type="text" id="search-input" placeholder="Buscar una tarea…" />
+        </div>
+      </div>
+
+      <section id="task-list" aria-live="polite"></section>
+
+      <div id="empty-state" hidden>
+        <div class="empty-bell">🔔</div>
+        <h3 id="empty-title">Aún no hay tareas para hoy</h3>
+        <p id="empty-copy">Añade la primera y te avisaré cuando toque, con notificación y sonido.</p>
+        <button class="btn-primary" id="empty-cta">Crear tarea</button>
+      </div>
+    </main>
+  </div>
+
+  <button id="fab-new-task" title="Nueva tarea" aria-label="Nueva tarea">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+    <span>Nueva tarea</span>
+  </button>
+
+  <!-- Cajón: crear / editar tarea -->
+  <div id="drawer-overlay" class="overlay" hidden></div>
+  <aside id="task-drawer" class="drawer" hidden aria-label="Formulario de tarea">
+    <div class="drawer-header">
+      <h2 id="drawer-title">Nueva tarea</h2>
+      <button class="icon-btn-ghost" id="drawer-close" aria-label="Cerrar">✕</button>
+    </div>
+
+    <form id="task-form" class="drawer-body">
+      <input type="hidden" id="task-id" />
+
+      <label class="field">
+        <span class="field-label">Título</span>
+        <input type="text" id="field-title" maxlength="80" placeholder="Ej. Llamar al banco" required />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Descripción (opcional)</span>
+        <textarea id="field-description" rows="2" maxlength="200" placeholder="Detalles de la tarea…"></textarea>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Fecha</span>
+          <input type="date" id="field-date" required />
+        </label>
+        <label class="field">
+          <span class="field-label">Hora</span>
+          <input type="time" id="field-time" required />
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Prioridad</span>
+          <select id="field-priority">
+            <option value="alta">Alta</option>
+            <option value="media" selected>Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Repetición</span>
+          <select id="field-repeat">
+            <option value="none" selected>No se repite</option>
+            <option value="diario">Cada día</option>
+            <option value="semanal">Cada semana</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Tipo de aviso</span>
+        <div class="segmented" id="field-notify-type">
+          <button type="button" class="segment" data-value="sistema">Notificación</button>
+          <button type="button" class="segment" data-value="sonido">Sonido</button>
+          <button type="button" class="segment active" data-value="ambos">Ambos</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Sonido</span>
+        <div class="sound-row">
+          <select id="field-sound"></select>
+          <button type="button" class="icon-btn" id="btn-preview-sound" title="Escuchar">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btn-import-sound" title="Importar sonido propio">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M5 20h14v-2H5v2zM12 2 6 8h4v6h4V8h4l-6-6z"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <p class="form-error" id="form-error" hidden></p>
+
+      <div class="drawer-actions">
+        <button type="button" class="btn-secondary" id="btn-cancel-task">Cancelar</button>
+        <button type="submit" class="btn-primary" id="btn-save-task">Guardar tarea</button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- Cajón: ajustes -->
+  <div id="settings-overlay" class="overlay" hidden></div>
+  <aside id="settings-drawer" class="drawer" hidden aria-label="Ajustes">
+    <div class="drawer-header">
+      <h2>Ajustes</h2>
+      <button class="icon-btn-ghost" id="settings-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="drawer-body">
+      <label class="field field-toggle">
+        <span>
+          <span class="field-label">Notificaciones activas</span>
+          <span class="field-hint">Apágalo para dejar de recibir avisos temporalmente.</span>
+        </span>
+        <input type="checkbox" id="setting-enabled" class="toggle" />
+      </label>
+
+      <label class="field field-toggle">
+        <span>
+          <span class="field-label">Minimizar a la bandeja</span>
+          <span class="field-hint">Al cerrar la ventana, la app sigue avisando en segundo plano.</span>
+        </span>
+        <input type="checkbox" id="setting-tray" class="toggle" />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Sonido predeterminado</span>
+        <div class="sound-row">
+          <select id="setting-default-sound"></select>
+          <button type="button" class="icon-btn" id="btn-preview-default-sound" title="Escuchar">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Volumen</span>
+        <input type="range" id="setting-volume" min="0" max="1" step="0.05" />
+      </label>
+
+      <p class="field-hint" style="margin-top: 4px;">Los datos se guardan solo en este equipo, en la carpeta de datos de la aplicación.</p>
+    </div>
+  </aside>
+
+  <!-- Confirmación de borrado -->
+  <div id="confirm-overlay" class="overlay" hidden>
+    <div class="confirm-box">
+      <p id="confirm-message">¿Eliminar esta tarea? No podrás deshacerlo.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+        <button class="btn-danger" id="confirm-accept">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avisos internos (toasts) -->
+  <div id="toast-container" aria-live="assertive"></div>
+
+  <audio id="audio-player"></audio>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
