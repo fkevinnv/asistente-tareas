@@ -1,0 +1,42 @@
+{
+  "name": "asistente-tareas-personal",
+  "version": "1.0.0",
+  "description": "Asistente de Tareas Personal — recordatorios con notificaciones y sonido",
+  "main": "main.js",
+  "author": "Tú",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.tuusuario.asistentetareaspersonal",
+    "productName": "Asistente de Tareas Personal",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "assets/icons/icon.png",
+      "target": "nsis"
+    },
+    "mac": {
+      "icon": "assets/icons/icon_1024.png",
+      "target": "dmg"
+    },
+    "linux": {
+      "icon": "assets/icons/icon_512.png",
+      "target": "AppImage"
+    }
+  }
+}
